@@ -10,20 +10,21 @@ namespace HelloWorldMicroservice.Controllers
 	[ApiController]
 	public class ValuesController : ControllerBase
 	{
-		private readonly List<string> _values;
+		private readonly List<IWheel> _values;
 
 		public ValuesController()
 		{
-			_values = new List<string>
+			_values = new List<IWheel>
 			{
-				"Hallo World"
+				WheelFactory.CreateIndoorWheel(),
+				WheelFactory.CreateOutdoorWheel()
 			};
 		}
 		// GET api/values
 		[HttpGet]
 		public ActionResult<IEnumerable<string>> Get()
 		{
-			return _values;
+			return new ActionResult<IEnumerable<string>>(_values.Select((each) => each.WheelSpecifications()));
 		}
 
 		// GET api/values/5
@@ -32,21 +33,21 @@ namespace HelloWorldMicroservice.Controllers
 		{
 			if (id >= _values.Count)
 			{
-				return "ID nicht vorhanden";
+				return null;
 			}
-			return _values[id];
+			return new ActionResult<string>(_values[id].WheelSpecifications());
 		}
 
 		// POST api/values
 		[HttpPost]
-		public void Post([FromBody] string value)
+		public void Post([FromBody] IWheel value)
 		{
 			_values.Add(value);
 		}
 
 		// PUT api/values/5
 		[HttpPut("{id}")]
-		public void Put(int id, [FromBody] string value)
+		public void Put(int id, [FromBody] IWheel value)
 		{
 			_values.Insert(id, value);
 		}
